@@ -1,0 +1,96 @@
+#! /bin/bash
+
+#if not exist, create a new file.n
+if [[ ! -e PhoneBookData.txt ]]; then
+    touch PhoneBookData.txt
+fi
+
+#no arguements, show all the contacts.
+if [ $# = 0 ]; then 
+	echo "OPTIONS: 					"	
+	echo "		-i : Insert new contact.	"
+	echo "		-v : Show saved contacts.	"
+	echo "		-s : Search in the contacts.	"
+	echo "		-e : Delete all the contacts.	"
+	echo "		-d : Delete one contact name.	"	
+			
+#one argument.
+elif [ $# = 1 ]; then
+
+	case $1 in
+
+	#insert new contact name and number.
+	-i)
+		read -p "Enter the name of the new contact:" new_name
+
+		#VALIDATION: checking if the name is dupilcated.
+		occurrence=$(grep -w i$new_name PhoneBookData.txt | wc -l)
+		
+		if [ $occurrence = 1 ]; then
+			echo "This name is already exist !"
+		#NOT FOUND, will be added.
+		else
+			read -p "Enter the number:" new_number
+
+			#append the data to the file.
+			echo "Name : $new_name || Number :  $new_number " >> PhoneBookData.txt
+
+		fi
+	;;
+	
+	#view all saved contacts details.
+	-v)
+		cat PhoneBookData.txt
+	;;
+	
+	#search by contact name.
+	-s)
+		read -p "Enter the name to search: " input_name
+
+		#VALIDATION: checking if the name is in the data or not.
+		occurrence=$(grep -w $input_name PhoneBookData.txt | wc -l)
+		
+		if [ $occurrence = 1 ]; then
+			search=$(grep -w $input_name PhoneBookData.txt)
+			echo "${search}"
+
+		#ERROR : NOT FOUND.
+		else
+			echo "Sorry, the name is not found !"
+		fi
+				
+	;;
+	
+	#delete all records.
+	-e)
+		rm PhoneBookData.txt	
+	;;
+	
+	#delete one contact name.
+	-d)
+		read -p "Enter the name to delete: " input_name
+
+		#VALIDATION: checking if the name is in the data or not.
+		occurrence=$(grep -w $input_name PhoneBookData.txt | wc -l)
+		
+		if [ $occurrence = 1 ]; then
+			grep -vw $input_name PhoneBookData.txt > tempfile && mv tempfile PhoneBookData.txt
+
+		#ERROR : NOT FOUND.
+		else
+			echo "Sorry, the name is not found !"
+		fi
+	;;
+	
+	#default, wrong argument.
+	*)
+		echo "ERROR : WRONG ARGUMENENT !"
+	;;
+	
+	esac
+
+# wrong number of arguments.
+else
+	echo "ERROR : WRONG ARGUMENENTS NUMBER !"
+
+fi
